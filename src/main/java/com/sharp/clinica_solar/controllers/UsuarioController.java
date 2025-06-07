@@ -36,18 +36,47 @@ public class UsuarioController {
 		return "login";
 	}
 	
+	@GetMapping("/jefecompras")
+	public String JefeCompras(HttpSession session) {
+	    if (session.getAttribute("usuario") == null) {
+	        return "redirect:/login";
+	    }
+	    return "/JefeCompras/homeCompras";
+	}
+	
+	@GetMapping("/jefeareas")
+	public String JefeAreas(HttpSession session) {
+	    if (session.getAttribute("usuario") == null) {
+	        return "redirect:/login";
+	    }
+	    return "/jefeAreas";
+	}
+
+	
+	
 	@PostMapping("/login")
 	public String login(@ModelAttribute Usuario usuario, HttpSession session) {
 		boolean loginExitoso = usuarioService.iniciarSesion(usuario.getNomUsuario(), usuario.getContraUsuario()); 
 		
 		if (loginExitoso) {
 			Usuario usuarioBD = usuarioService.buscarPorNombre(usuario.getNomUsuario());
-
 			session.setAttribute("usuario", usuarioBD);
-			System.out.println("Inicio de sesión exitoso para el usuario: " + usuario.getNomUsuario());
-			return "redirect:/";
-		}
-		
-		return "redirect:/login";
+			
+			String rolDesc = usuarioBD.getIdRol() == 1 ? "JefeCompras" :
+				usuarioBD.getIdRol() == 2 ? "JefeAreas" :
+				usuarioBD.getIdRol() == 3 ? "Medico" : "Usuario"; // Asignar rol por id
+			
+			switch (rolDesc) {
+            case "JefeCompras":
+                return "redirect:/jefecompras";
+            case "JefeAreas":
+                return "redirect:/jefeareas";
+            case "Medico":
+                return "redirect:/medico";
+            default:
+                return "redirect:/";
+        }
+    }
+    return "redirect:/login";
 	}
 }
