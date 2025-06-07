@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Elementos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Lista de Elementos</h1>
+
+        <div class="filtro">
+            <label for="filtro">Filtro de Elementos</label>
+            <select id="filtro" name="categoria" th:onchange="this.form.submit()" form="formulario">
+                <option th:each="cat : ${categorias}" 
+                        th:value="${cat}" 
+                        th:text="${cat}" 
+                        th:selected="${cat == categoriaSeleccionada}">
+                </option>
+            </select>
+        </div>
+
+        <form id="formulario" th:action="@{/enviar-solicitud}" method="post">
+            <div class="lista">
+                <div class="item" th:each="elemento : ${elementos}">
+                    <div class="imagen"></div>
+                    <span th:text="${elemento.nombre}">Nombre</span>
+                    <select name="cantidades" th:name="'cantidades[' + ${elemento.id} + ']'">
+                        <option th:each="i : ${#numbers.sequence(1, 10)}" th:value="${i}" th:text="${i}">1</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="boton">
+                <button type="submit">Enviar Solicitud</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
