@@ -1,0 +1,23 @@
+<div class="flex flex-col h-screen w-1/6 bg-[8ad4eb]  justify-between items-center" th:fragment="barraLateral(usuario)">
+	<div class="h-1/8 w-full flex items-center justify-center container">
+		<h2 class="text-5xl font-bold text-white">Clinica Solar</h2>
+	</div>
+	<div class="h-6/8 w-full flex container">
+		<ul th:switch="${usuario.getIdRol()}">
+			<div th:case=1>
+				<li>Es Admin</li>
+			</div>
+			<div th:case=2 class="flex flex-col gap-5 w-full">
+				<a href="#" class="text-xl p-4 text-white hover:bg-white hover:text-[82ddfa] transition-colors duration-300 w-full">Solicitar Nuevos Elementos</a>
+				<a href="#" class="text-xl p-4 text-white hover:bg-white hover:text-[82ddfa] transition-colors duration-300 w-full">Inventario</a>
+			</div>
+		</ul>
+	</div>
+	<div class="h-1/8 flex items-center justify-around w-full">
+		<a onclick="confirmarLogout()">Cerrar Sesión</a>
+		<div>Acciones</div>
+		<div>Acciones</div>
+		<div>Acciones</div>
+	</div>
+	
+</div>
