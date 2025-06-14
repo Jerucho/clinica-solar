@@ -44,13 +44,22 @@ public class UsuarioController {
 			Usuario usuarioBD = usuarioService.buscarPorNombre(usuario.getNomUsuario());
 
 			session.setAttribute("usuario", usuarioBD);
-			System.out.println("Inicio de sesión exitoso para el usuario: " + usuario.getNomUsuario());
-			return "redirect:/";
+			
+				switch (usuarioBD.getIdRol()) {
+	            case 1:
+	                return "redirect:/jefecompras";
+	            case 2:
+	                return "redirect:/jefeareas";
+	            case 3:
+	                return "redirect:/medico";
+	            default:
+	                return "redirect:/";
+				}
 		}
-		
 		return "redirect:/login";
-	}
+				}
 	
+		
 	@GetMapping("/confirmarLogout")
 	public String confirmarLogout(Model model,HttpSession session) {
 		
@@ -72,9 +81,4 @@ public class UsuarioController {
 		} 
 		return "redirect:/login";
 	}
-	
-	
-
-	
-	
 }
