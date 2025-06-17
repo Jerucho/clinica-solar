@@ -26,9 +26,6 @@ public class JefeCompraController {
 	@GetMapping()
 	public String home(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
-			return "redirect:/login";
-		}
 		model.addAttribute("usuario", usuario);
 		return "JefeCompras/homeCompras";
 	}
@@ -52,10 +49,6 @@ public class JefeCompraController {
 	@GetMapping("/pedidos")
 	public String pedidos(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-
-		if (usuario == null || usuario.getIdRol() != 1) {
-			return "redirect:/login";
-		}
 		model.addAttribute("usuario", usuario);
 
 		return "JefeCompras/listaCompras";
@@ -64,9 +57,6 @@ public class JefeCompraController {
 	@GetMapping("/compra")
 	public String compra(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
-			return "redirect:/login";
-		}
 		model.addAttribute("usuario", usuario);
 
 		return "JefeCompras/comprarProductos";
@@ -75,9 +65,6 @@ public class JefeCompraController {
 	@GetMapping("/proveedores")
 	public String proveedores(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
-			return "redirect:/login";
-		}
 		model.addAttribute("usuario", usuario);
 
 		return "JefeCompras/listaProveedores";
