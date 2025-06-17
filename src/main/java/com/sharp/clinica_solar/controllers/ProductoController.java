@@ -20,7 +20,7 @@ public class ProductoController {
     @GetMapping
     public String listarProductos(Model model) {
         model.addAttribute("productos", productoRepo.findAll());
-        return "productos/lista";
+        return "Medico/crearLista";
     }
 
     @GetMapping("/editar/{id}")
@@ -45,5 +45,5 @@ public class ProductoController {
         productoRepo.deleteById(id);
         return "redirect:/productos";
     }
-    
 }
+
