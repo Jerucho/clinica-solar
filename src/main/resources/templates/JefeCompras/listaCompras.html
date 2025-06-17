@@ -16,7 +16,43 @@
 			<h1>Bienvenido</h1>
 			<p>Listas de Pedidos</p>
 		</div>
-	</div>
+		
+		
+		<div th:if="${#lists.isEmpty(pedidos)}" class="p-4">
+            <p class="text-gray-500">No hay pedidos disponibles.</p>
+			        </div>
+					
+			<div th:unless="${#lists.isEmpty(pedidos)}" class="p-4">
+		<table>
+			<thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Fecha</th>
+                    <th>Proveedor</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.id}"></td>
+                    <td th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${pedido.proveedor.nombre}"></td>
+                    <td th:text="${pedido.total}"></td>
+                    <td th:text="${pedido.estado}"></td>
+                    <td>
+                        <a th:href="@{/compras/detalle/{id}(id=${pedido.id})}" class="text-blue-500 hover:underline">Ver Detalles</a>
+                    </td>
+                </tr>
+            </tbody>
+			
+			
+			</table>
+			</div>
+			</div>
+						
+		</div>
 </body>
 
 </html>
