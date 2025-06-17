@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Productos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<div class="container">
+
+    <div th:replace="Reutilizables/navbar :: navbar"></div>
+
+    <h1>Productos Disponibles</h1>
+
+    <div class="lista">
+        <div class="item" th:each="producto : ${productos}">
+            <span th:text="${producto.nombre}">Nombre del producto</span>
+            <form th:action="@{/lista-compra/agregar}" method="post" style="display:inline-block;">
+                <input type="hidden" th:name="id" th:value="${producto.id}" />
+                <select name="cantidad">
+                    <option th:each="i : ${#numbers.sequence(1, 10)}"
+                            th:value="${i}"
+                            th:text="${i}">
+                    </option>
+                </select>
+                <button type="submit">Agregar a lista de compra</button>
+            </form>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Lista de Compra</h2>
+
+    <form th:action="@{/lista-compra/enviar}" method="post">
+        <div class="lista-compra">
+            <div class="item-compra" th:each="item : ${listaCompra}">
+                <span th:text="${item.nombre}">Producto</span>
+                <input type="hidden" th:name="'ids[' + ${item.id} + ']'" th:value="${item.id}" />
+                <input type="number" th:name="'cantidades[' + ${item.id} + ']'" th:value="${item.cantidad}" min="1" max="100"/>
+                <a th:href="@{/lista-compra/eliminar/{id}(id=${item.id})}">Eliminar</a>
+            </div>
+        </div>
+
+        <div class="boton">
+            <button type="submit">Enviar Lista de Compra</button>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>
