@@ -48,9 +48,9 @@ public class UsuarioController {
 				switch (usuarioBD.getIdRol()) {
 	            case 1:
 	                return "redirect:/jefecompras";
-	            case 3:
-	                return "redirect:/jefeareas";
 	            case 2:
+	                return "redirect:/jefeareas";
+	            case 3:
 	                return "redirect:/medico";
 	            default:
 	                return "redirect:/";
