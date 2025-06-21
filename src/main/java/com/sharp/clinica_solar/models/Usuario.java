@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Usuario {
@@ -14,8 +15,8 @@ public class Usuario {
 	@Column(name = "idUsuario")
 	private int idUsuario;
 
-	@Column(name = "idRol")
-	private int idRol;
+	@ManyToOne(optional = false)
+    private Rol rol;
 	
 	@Column(name = "nomUsuario")
 	private String nomUsuario;
@@ -31,10 +32,10 @@ public class Usuario {
 		super();
 	}
 	
-	public Usuario(int idUsuario, int idRol, String nomUsuario, String correoUsuario, String contraUsuario) {
+	public Usuario(int idUsuario, Rol idRol, String nomUsuario, String correoUsuario, String contraUsuario) {
 		super();
 		this.idUsuario = idUsuario;
-		this.idRol = idRol;
+		this.rol = idRol;
 		this.nomUsuario = nomUsuario;
 		this.correoUsuario = correoUsuario;
 		this.contraUsuario = contraUsuario;
@@ -48,12 +49,12 @@ public class Usuario {
 		this.idUsuario = idUsuario;
 	}
 
-	public int getIdRol() {
-		return idRol;
+	public Rol getRol() {
+		return rol;
 	}
 
-	public void setIdRol(int idRol) {
-		this.idRol = idRol;
+	public void setRol(Rol idRol) {
+		this.rol = idRol;
 	}
 
 	public String getNomUsuario() {

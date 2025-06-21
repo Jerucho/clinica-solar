@@ -19,4 +19,9 @@ public class ElementoService {
 		return _elementoRepository.findAll();
 	}
 	
+	public List<Elemento> encontrarCoincidenciasPorNombre(String query) {
+		return _elementoRepository.findByNomElementoContainingIgnoreCase(query);
+	}
+	
+	
 }
