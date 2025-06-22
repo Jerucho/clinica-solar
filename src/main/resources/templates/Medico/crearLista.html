@@ -9,20 +9,23 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
   <div class="flex gap-4">
+    
     <div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
 
+    
     <div class="flex flex-col w-full bg-white p-6 rounded shadow-lg">
-      <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-2">Solicitud de Insumos</h2>
+      <h2 class="text-2xl font-semibold text-gray-700 border-b pb-4 mb-4">Solicitud de Insumos</h2>
 
-
-      <div class="mb-4">
+      
+      <div class="relative mb-6">
         <label for="buscador" class="block text-sm font-medium text-gray-700 mb-1">Buscar Insumo</label>
-        <input type="text" id="buscador" list="listaInsumos" placeholder="Escribe y selecciona un insumo"
-          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-        <datalist id="listaInsumos"></datalist>
+        <input type="text" id="buscador" name="insumo"
+          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          placeholder="Ingresa el nombre del insumo" autocomplete="off">
+        <ul id="sugerencias" class="absolute z-10 bg-white border border-gray-300 mt-1 rounded w-full shadow-md max-h-60 overflow-y-auto"></ul>
       </div>
 
-
+      
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white divide-y divide-gray-200 border rounded">
           <thead class="bg-gray-50">
@@ -46,36 +49,40 @@
 
   <script>
     const input = document.getElementById("buscador");
-    const datalist = document.getElementById("listaInsumos");
+    const sugerencias = document.getElementById("sugerencias");
     const tablaElementos = document.getElementById("tablaElementos");
     const btnCrearSolicitud = document.getElementById("btnCrearSolicitud");
 
     let insumosCargados = [];
 
-    input.addEventListener("input", () => {
-      const seleccion = insumosCargados.find(item => item.nomElemento === input.value);
-      if (seleccion) {
-        agregarElemento(seleccion);
-        input.value = "";
+    input.addEventListener("input", async () => {
+      const query = input.value.trim();
+      if (query.length < 2) {
+        sugerencias.innerHTML = "";
+        return;
       }
-    });
 
-    async function cargarSugerencias() {
       try {
-        const response = await fetch('/elementos/buscar?query=');
+        const response = await fetch(`/elementos/buscar?query=${encodeURIComponent(query)}`);
         const datos = await response.json();
         insumosCargados = datos;
 
-        datalist.innerHTML = "";
+        sugerencias.innerHTML = "";
         datos.forEach(item => {
-          const option = document.createElement("option");
-          option.value = item.nomElemento;
-          datalist.appendChild(option);
+          const li = document.createElement("li");
+          li.textContent = `${item.nomElemento} (${item.cantActual})`;
+          li.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer text-sm text-gray-700";
+          li.addEventListener("click", () => {
+            input.value = "";
+            sugerencias.innerHTML = "";
+            agregarElemento(item);
+          });
+          sugerencias.appendChild(li);
         });
       } catch (error) {
-        console.error("Error cargando insumos:", error);
+        console.error("Error al buscar insumos:", error);
       }
-    }
+    });
 
     function agregarElemento(item) {
       const yaExiste = document.querySelector(`tr[data-id="${item.idElemento}"]`);
@@ -146,9 +153,6 @@
         });
       }
     });
-
-    // Cargar sugerencias al iniciar
-    cargarSugerencias();
   </script>
 </body>
 </html>
