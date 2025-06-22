@@ -1,142 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Lista de Productos</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8">
+  <title>Lista de Productos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-	<div class="flex">
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="flex gap-4">
+    <div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
 
-		<div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
+    <div class="flex flex-col w-full bg-white p-6 rounded shadow-lg">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-2">Solicitud de Insumos</h2>
 
 
-		<div class='flex flex-col'>
-			<h2>Tabla de elementos agregados</h2>
-			<div>
-				<label for="buscador">Buscar Insumo:</label> <input type="text"
-					id="buscador" name="insumo">
-				<ul id="sugerencias" style="border: 1px solid #ccc;"></ul>
-			</div>
-			<table class="min-w-full divide-y divide-gray-200">
-				<thead class="bg-gray-50">
-					<tr>
-						<th scope="col"
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-						<th scope="col" w
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-						<th scope="col"
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-						<th scope="col"
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-					</tr>
-				</thead>
-				<tbody id="tablaElementos">
+      <div class="mb-4">
+        <label for="buscador" class="block text-sm font-medium text-gray-700 mb-1">Buscar Insumo</label>
+        <input type="text" id="buscador" list="listaInsumos" placeholder="Escribe y selecciona un insumo"
+          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <datalist id="listaInsumos"></datalist>
+      </div>
 
-				</tbody>
 
-			</table>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white divide-y divide-gray-200 border rounded">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">ID</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Cantidad</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaElementos" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
 
-			<button id="btnCrearSolicitud"
-				class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Crear
-				Solicitud</button>
-		</div>
-		<script>
-        const input = document.getElementById("buscador");
-        const sugerencias = document.getElementById("sugerencias");
-	    const tablaElementos = document.getElementById("tablaElementos");
-	    const btnCrearSoliciud = document.getElementById("btnCrearSolicitud");
+      <button id="btnCrearSolicitud"
+        class="mt-6 self-end px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">
+        Crear Solicitud
+      </button>
+    </div>
+  </div>
 
-        btnCrearSoliciud.addEventListener("click", async () => {
-            const filas = Array.from(tablaElementos.querySelectorAll("tr"));
-            const elementos = filas.map(fila => {
-            	const idElemento = fila.getAttribute("data-id");
-                const nombre = fila.querySelector("td:nth-child(1)").textContent;
-                const cantidad = fila.querySelector("input[type='number']").value;
-                return { 
-                    nombre: nombre, 
-                    cantidad: parseInt(cantidad), 
-                    idElemento: parseInt(idElemento) 
-                };
-            });
+  <script>
+    const input = document.getElementById("buscador");
+    const datalist = document.getElementById("listaInsumos");
+    const tablaElementos = document.getElementById("tablaElementos");
+    const btnCrearSolicitud = document.getElementById("btnCrearSolicitud");
 
-            if (elementos.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No hay elementos para enviar',
-                    text: 'Por favor, agrega al menos un elemento antes de crear la solicitud.'
-                });
-                return;
-            }
+    let insumosCargados = [];
 
-            try {
-                const response = await fetch('/medico/solicitarCompra', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(elementos)
-                });
+    input.addEventListener("input", () => {
+      const seleccion = insumosCargados.find(item => item.nomElemento === input.value);
+      if (seleccion) {
+        agregarElemento(seleccion);
+        input.value = "";
+      }
+    });
 
-                if (response.ok) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Solicitud creada',
-                        text: 'La solicitud se ha creado exitosamente.'
-                    });
-                    tablaElementos.innerHTML = ""; // Limpiar la tabla
-                } else {
-                    throw new Error('Error al crear la solicitud');
-                }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-                });
-            }
+    async function cargarSugerencias() {
+      try {
+        const response = await fetch('/elementos/buscar?query=');
+        const datos = await response.json();
+        insumosCargados = datos;
+
+        datalist.innerHTML = "";
+        datos.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.nomElemento;
+          datalist.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando insumos:", error);
+      }
+    }
+
+    function agregarElemento(item) {
+      const yaExiste = document.querySelector(`tr[data-id="${item.idElemento}"]`);
+      if (yaExiste) return;
+
+      tablaElementos.innerHTML += `
+        <tr data-id="${item.idElemento}" class="bg-white hover:bg-gray-50 transition">
+          <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.idElemento}</td>
+          <td class="px-6 py-4 text-sm text-gray-700">${item.nomElemento}</td>
+          <td class="px-6 py-4"><input type="number" class="w-20 border px-2 py-1 rounded" placeholder="Cantidad" /></td>
+          <td class="px-6 py-4">
+            <button onclick="eliminarElemento('${item.idElemento}')" class="text-red-600 hover:text-red-800 font-semibold">
+              Eliminar
+            </button>
+          </td>
+        </tr>`;
+    }
+
+    function eliminarElemento(idElemento) {
+      const fila = document.querySelector(`tr[data-id="${idElemento}"]`);
+      if (fila) fila.remove();
+    }
+
+    btnCrearSolicitud.addEventListener("click", async () => {
+      const filas = Array.from(tablaElementos.querySelectorAll("tr"));
+      const elementos = filas.map(fila => {
+        const idElemento = fila.getAttribute("data-id");
+        const nombre = fila.querySelector("td:nth-child(1)").textContent;
+        const cantidad = fila.querySelector("input[type='number']").value;
+        return {
+          nombre: nombre,
+          cantidad: parseInt(cantidad),
+          idElemento: parseInt(idElemento)
+        };
+      });
+
+      if (elementos.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No hay elementos para enviar',
+          text: 'Por favor, agrega al menos un elemento antes de crear la solicitud.'
+        });
+        return;
+      }
+
+      try {
+        const response = await fetch('/medico/solicitarCompra', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(elementos)
         });
 
-        function eliminarElemento(idElemento) {
-            const fila = document.querySelector(`tr[data-id="${idElemento}"]`);
-            if (fila) {
-                fila.remove();
-            }
+        if (response.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Solicitud creada',
+            text: 'La solicitud se ha creado exitosamente.'
+          });
+          tablaElementos.innerHTML = "";
+        } else {
+          throw new Error('Error al crear la solicitud');
         }
-        
-	    input.addEventListener("input", async () => {
-            const query = input.value;
-            if (query.length < 2) {
-                sugerencias.innerHTML = "";
-                return;
-            }
-
-            const response = await fetch(`/elementos/buscar?query=${query}`);
-            const datos = await response.json();
-
-            sugerencias.innerHTML = "";
-            datos.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = `${item.nomElemento} (${item.cantActual})`;
-                li.addEventListener("click", () => {
-                    input.value = item.nomElemento;
-                    sugerencias.innerHTML = "";
-                    tablaElementos.innerHTML += `
-                        <tr data-id="${item.idElemento}" class="bg-white border-b">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" >${item.idElemento}</td>	
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.nomElemento}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><input type="number" placeholder="Cantidad"/></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button class="text-red-600 hover:text-red-900" onclick="eliminarElemento('${item.idElemento}')">Eliminar</button>
-                            </td>
-                        </tr>`;
-                });
-                sugerencias.appendChild(li);
-            });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message
         });
-    </script>
-	</div>
+      }
+    });
+
+    // Cargar sugerencias al iniciar
+    cargarSugerencias();
+  </script>
 </body>
 </html>
