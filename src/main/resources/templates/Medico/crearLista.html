@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Lista de Productos</title>
+  <title>Solicitud de Insumos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -17,12 +17,11 @@
       <h2 class="text-2xl font-semibold text-gray-700 border-b pb-4 mb-4">Solicitud de Insumos</h2>
 
       
-      <div class="relative mb-6">
+      <div class="mb-6">
         <label for="buscador" class="block text-sm font-medium text-gray-700 mb-1">Buscar Insumo</label>
-        <input type="text" id="buscador" name="insumo"
-          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-          placeholder="Ingresa el nombre del insumo" autocomplete="off">
-        <ul id="sugerencias" class="absolute z-10 bg-white border border-gray-300 mt-1 rounded w-full shadow-md max-h-60 overflow-y-auto"></ul>
+        <input type="text" id="buscador" list="listaInsumos" placeholder="Escribe y selecciona un insumo"
+          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" autocomplete="off" />
+        <datalist id="listaInsumos"></datalist>
       </div>
 
       
@@ -40,6 +39,7 @@
         </table>
       </div>
 
+      <!-- Botón -->
       <button id="btnCrearSolicitud"
         class="mt-6 self-end px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">
         Crear Solicitud
@@ -47,43 +47,43 @@
     </div>
   </div>
 
+  <!-- Script funcional -->
   <script>
     const input = document.getElementById("buscador");
-    const sugerencias = document.getElementById("sugerencias");
+    const datalist = document.getElementById("listaInsumos");
     const tablaElementos = document.getElementById("tablaElementos");
     const btnCrearSolicitud = document.getElementById("btnCrearSolicitud");
 
     let insumosCargados = [];
 
-    input.addEventListener("input", async () => {
-      const query = input.value.trim();
-      if (query.length < 2) {
-        sugerencias.innerHTML = "";
-        return;
-      }
-
-      try {
-        const response = await fetch(`/elementos/buscar?query=${encodeURIComponent(query)}`);
-        const datos = await response.json();
-        insumosCargados = datos;
-
-        sugerencias.innerHTML = "";
-        datos.forEach(item => {
-          const li = document.createElement("li");
-          li.textContent = `${item.nomElemento} (${item.cantActual})`;
-          li.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer text-sm text-gray-700";
-          li.addEventListener("click", () => {
-            input.value = "";
-            sugerencias.innerHTML = "";
-            agregarElemento(item);
-          });
-          sugerencias.appendChild(li);
-        });
-      } catch (error) {
-        console.error("Error al buscar insumos:", error);
+    // Buscar insumos al escribir
+    input.addEventListener("input", () => {
+      const seleccion = insumosCargados.find(item => item.nomElemento === input.value);
+      if (seleccion) {
+        agregarElemento(seleccion);
+        input.value = "";
       }
     });
 
+    // Cargar insumos desde el backend
+    async function cargarSugerencias() {
+      try {
+        const response = await fetch('/elementos/buscar?query=');
+        const datos = await response.json();
+        insumosCargados = datos;
+
+        datalist.innerHTML = "";
+        datos.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.nomElemento;
+          datalist.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando insumos:", error);
+      }
+    }
+
+    // Agrega fila a tabla
     function agregarElemento(item) {
       const yaExiste = document.querySelector(`tr[data-id="${item.idElemento}"]`);
       if (yaExiste) return;
@@ -92,7 +92,9 @@
         <tr data-id="${item.idElemento}" class="bg-white hover:bg-gray-50 transition">
           <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.idElemento}</td>
           <td class="px-6 py-4 text-sm text-gray-700">${item.nomElemento}</td>
-          <td class="px-6 py-4"><input type="number" class="w-20 border px-2 py-1 rounded" placeholder="Cantidad" /></td>
+          <td class="px-6 py-4">
+            <input type="number" class="w-20 border px-2 py-1 rounded" placeholder="Cantidad" />
+          </td>
           <td class="px-6 py-4">
             <button onclick="eliminarElemento('${item.idElemento}')" class="text-red-600 hover:text-red-800 font-semibold">
               Eliminar
@@ -101,11 +103,13 @@
         </tr>`;
     }
 
+    // Eliminar fila
     function eliminarElemento(idElemento) {
       const fila = document.querySelector(`tr[data-id="${idElemento}"]`);
       if (fila) fila.remove();
     }
 
+    // Crear solicitud
     btnCrearSolicitud.addEventListener("click", async () => {
       const filas = Array.from(tablaElementos.querySelectorAll("tr"));
       const elementos = filas.map(fila => {
@@ -153,6 +157,9 @@
         });
       }
     });
+
+    // Ejecutar al cargar la página
+    cargarSugerencias();
   </script>
 </body>
 </html>
