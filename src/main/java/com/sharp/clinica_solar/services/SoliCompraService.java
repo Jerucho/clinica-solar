@@ -3,6 +3,7 @@ package com.sharp.clinica_solar.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -48,5 +49,13 @@ public class SoliCompraService {
 
 		soliCompraRepository.save(solicitud);
 	}
-
+	public List<SoliCompra> obtenerSolicitudesPorUsuario(Usuario usuario) {
+	    return soliCompraRepository.findByUsuarioOrderByFechaCreacionDesc(usuario);
+	}
+	public void eliminarSolicitudPorIdYUsuario(Long id, Usuario usuario) {
+	    Optional<SoliCompra> solicitud = soliCompraRepository.findById(id);
+	    if (solicitud.isPresent() && solicitud.get().getUsuario().getIdUsuario() == usuario.getIdUsuario()) {
+	        soliCompraRepository.delete(solicitud.get());
+	    }
+	}
 }

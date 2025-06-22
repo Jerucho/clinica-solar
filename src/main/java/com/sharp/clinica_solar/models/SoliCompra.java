@@ -86,6 +86,10 @@ public class SoliCompra {
 		this.elementos = elementos;
 	}
 	
-	
+	public int getCantidadTotalInsumos() {
+	    return elementos.stream()
+	        .mapToInt(SoliElemento::getCantSolicitada)
+	        .sum();
+	}
 
 }
