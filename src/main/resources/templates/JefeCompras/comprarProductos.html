@@ -19,10 +19,11 @@
                 <label for="proveedores-select" class="block mb-2 text-gray-700 font-medium">Proveedores</label>
                 <select id="proveedores-select"
                         class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Seleccione un proveedor</option>
-                    <option value="sac_envios">Sac. Envios</option>
-                    <option value="prov_a">Proveedor Alfa</option>
-                    <option value="prov_b">Proveedor Beta</option>
+                    <option value="" disabled selected>Seleccione un proveedor</option>
+                    <option th:each="prov : ${listaProveedores}"
+                        th:value="${prov.idProveedor}"
+                        th:text="${prov.nomProveedor}">
+                    </option>
                 </select>
             </div>
 

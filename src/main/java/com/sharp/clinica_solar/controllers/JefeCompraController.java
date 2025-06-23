@@ -67,13 +67,13 @@ public class JefeCompraController {
 
 	@GetMapping("/compra")
 	public String compra(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getRol().getIdRol() != 1) {
-			return "redirect:/login";
-		}
-		model.addAttribute("usuario", usuario);
-
-		return "JefeCompras/comprarProductos";
+          Usuario usuario = (Usuario) session.getAttribute("usuario");
+          if (usuario == null || usuario.getRol().getIdRol() != 1) {
+                  return "redirect:/login";
+          }
+          model.addAttribute("usuario", usuario);
+          model.addAttribute("listaProveedores", _proveedorService.listarProveedor());
+          return "JefeCompras/comprarProductos";
 	}
 
 	@GetMapping("/proveedores")
