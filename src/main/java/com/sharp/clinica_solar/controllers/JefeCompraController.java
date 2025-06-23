@@ -12,15 +12,19 @@ import com.sharp.clinica_solar.services.ElementoService;
 
 import jakarta.servlet.http.HttpSession;
 import com.sharp.clinica_solar.models.Elemento;
+import com.sharp.clinica_solar.models.Proveedor;
+import com.sharp.clinica_solar.services.ProveedorService;
 
 @Controller
 @RequestMapping("/jefecompras")
 public class JefeCompraController {
 
 	private final ElementoService _elementoService;
+        private final ProveedorService _proveedorService;
 
-	public JefeCompraController(ElementoService elementoService) {
-		this._elementoService = elementoService;
+	public JefeCompraController(ElementoService elementoService, ProveedorService proveedorService) {
+          this._elementoService = elementoService;
+          this._proveedorService = proveedorService;
 	}
 
 	@GetMapping()
@@ -74,12 +78,13 @@ public class JefeCompraController {
 
 	@GetMapping("/proveedores")
 	public String proveedores(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getRol().getIdRol() != 1) {
-			return "redirect:/login";
-		}
-		model.addAttribute("usuario", usuario);
-
-		return "JefeCompras/listaProveedores";
+          Usuario usuario = (Usuario) session.getAttribute("usuario");
+          if (usuario == null || usuario.getRol().getIdRol() != 1) {
+            return "redirect:/login";
+          }
+          model.addAttribute("usuario", usuario);
+          model.addAttribute("proveedor", new Proveedor());
+          model.addAttribute("listaProveedores", _proveedorService.listarProveedor());
+          return "JefeCompras/listaProveedores";
 	}
 }

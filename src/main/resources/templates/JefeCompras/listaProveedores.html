@@ -2,117 +2,195 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 
 <head>
-	<meta charset="UTF-8">
-	<title>Proveedor</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <title>Proveedor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
 <body class="bg-gray-100 text-gray-900">
+    <div class="flex min-h-screen">
+        <div th:replace="fragments/BarraLateral :: barraLateral(${usuario})">
+        </div>
+        <div class="flex-grow p-8 rounded-lg ">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Agregar Proveedores</h1>
+            <div class="mb-8">
+                <form th:action="@{/proveedores/guardar}" th:object="${proveedor}" method="post" class="flex flex-col gap-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Proveedor</label>
+                    <input type="text" th:field="*{nomProveedor}" placeholder="Ej. Proveedor A"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
 
-	<div class="flex min-h-screen">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono del Proveedor</label>
+                    <input type="text" th:field="*{telefono}" placeholder="Ej. 987654321"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
 
-		<div th:replace="fragments/BarraLateral :: barraLateral(${usuario})">
-		</div>
-		<div class="flex-grow p-8 rounded-lg ">
-			<h1 class="text-3xl font-bold mb-6 text-gray-800">Agregar Proveedores</h1>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo del Proveedor</label>
+                    <input type="email" th:field="*{correo}" placeholder="Ej. proveedor@example.com"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
 
-			<div class="mb-8">
-				<form method="post" class="flex flex-col gap-4">
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Proveedor</label>
-						<input type="text" name="nombre" placeholder="Ej. Proveedor A"
-							class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-					</div>
+                    <div class="flex justify-end">
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-medium px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Agregar Proveedor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="flex-grow p-8">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Listar Proveedores</h1>
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Nombre</th>
+                        <th class="py-3 px-6 text-left">Teléfono</th>
+                        <th class="py-3 px-6 text-left">Correo Electrónico</th>
+                        <th class="py-3 px-6 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="prov :${listaProveedores}">
+                        <td class="py-4 px-6" th:text="${prov.nomProveedor}">Nombre</td>
+                        <td class="py-4 px-6" th:text="${prov.telefono}">Telefono</td>
+                        <td class="py-4 px-6" th:text="${prov.correo}">Email</td>
+                        <td class="py-4 px-6 text-center">
+                            <button>
+                                <a 
+                                    href="#"
+                                    th:attr="data-id=${prov.idProveedor}, 
+                                        data-nombre=${prov.nomProveedor}, 
+                                        data-telefono=${prov.telefono}, 
+                                        data-correo=${prov.correo}"
+                                    onclick="openEditModal(this)"
+                                    class="text-blue-600 hover:text-blue-800">
+                                    Editar
+                                </a>
+                            </button> |
+                            <button>
+                                <a 
+                                    href="#"
+                                    th:attr="data-id=${prov.idProveedor}"
+                                    onclick="confirmarEliminar(this)" 
+                                    class="text-red-600 hover:text-red-800">
+                                    Eliminar
+                                </a>
+                            </button> |
+                            <button th:attr="onclick=|openModal('${prov.nomProveedor}', '${prov.telefono}', '${prov.correo}')|"
+                                class="text-green-600 hover:text-blue-800">
+                                Más info
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Teléfono del Proveedor</label>
-						<input type="text" name="telefono" placeholder="Ej. 987654321"
-							class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-					</div>
+            <div id="infoModal"
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+                <div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+                    <h2 class="text-xl font-bold mb-4">Información del Proveedor</h2>
+                    <p><strong>Nombre:</strong> <span id="modalNombre"></span></p>
+                    <p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
+                    <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                    <div class="text-right mt-4">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Cerrar</button>
+                    </div>
+                </div>
+            </div>
 
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Correo del Proveedor</label>
-						<input type="email" name="correoElectronico" placeholder="Ej. proveedor@example.com"
-							class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-					</div>
+        </div>
 
-					<div class="flex justify-end">
-						<button type="submit"
-							class="bg-blue-600 text-white font-medium px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-							Agregar Proveedor
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="flex-grow p-8">
-			<h1 class="text-3xl font-bold mb-6 text-gray-800">Listar Proveedores</h1>
-			<table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-				<thead>
-					<tr class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
-						<th class="py-3 px-6 text-left">Nombre</th>
-						<th class="py-3 px-6 text-left">Teléfono</th>
-						<th class="py-3 px-6 text-left">Correo Electrónico</th>
-						<th class="py-3 px-6 text-center">Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td class="py-4 px-6">01</td>
-						<td class="py-4 px-6">sebas</td>
-						<td class="py-4 px-6">dev</td>
-						<td class="py-4 px-6 text-center">
-							<button><a class="text-blue-600 hover:text-blue-800">Editar</a></button> |
-							<button><a class="text-red-600 hover:text-red-800">Eliminar</a></button> |
-							<button onclick="openModal('Sebasdev', '123456789', 'yopi')"
-								class="text-green-600 hover:text-blue-800">
-								Más info
-							</button>
-						</td>
+    </div>
 
+    <!-- Modal Editar Proveedor -->
+    <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+      <div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Editar Proveedor</h2>
+        <form id="editForm" method="post" class="flex flex-col gap-4">
+          <input type="hidden" id="editId" name="idProveedor">
 
-					</tr>
-				</tbody>
-			</table>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input type="text" id="editNombre" name="nomProveedor"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
+          </div>
 
-			<div id="infoModal"
-				class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-				<div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
-					<h2 class="text-xl font-bold mb-4">Información del Proveedor</h2>
-					<p><strong>Nombre:</strong> <span id="modalNombre"></span></p>
-					<p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
-					<p><strong>Email:</strong> <span id="modalEmail"></span></p>
-					<div class="text-right mt-4">
-						<button onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-							Cerrar
-						</button>
-					</div>
-				</div>
-			</div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <input type="text" id="editTelefono" name="telefono"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
+          </div>
 
-		</div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+            <input type="email" id="editCorreo" name="correo"
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
+          </div>
 
-	</div>
+          <div class="flex justify-end mt-4 space-x-2">
+            <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+              Cancelar
+            </button>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-	<script>
-		function openModal(nombre, telefono, email) {
-			document.getElementById('modalNombre').textContent = nombre;
-			document.getElementById('modalTelefono').textContent = telefono;
-			document.getElementById('modalEmail').textContent = email;
-			document.getElementById('infoModal').classList.remove('hidden');
-		}
+    
+    <script>
+        function openModal(nombre, telefono, email) {
+            document.getElementById('modalNombre').textContent = nombre;
+            document.getElementById('modalTelefono').textContent = telefono;
+            document.getElementById('modalEmail').textContent = email;
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
 
-		function closeModal() {
-			document.getElementById('infoModal').classList.add('hidden');
-		}
-	</script>
+        function closeModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+        
+        function confirmarEliminar(link) {
+            const id = link.getAttribute('data-id');
 
-	</div>
-	</div>
-	<script src="/scriptReutilisable.js"></script>
+            Swal.fire({
+              title: '¿Eliminar proveedor?',
+              text: 'Esta acción no se puede deshacer.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = '/proveedores/eliminar/' + id;
+              }
+            });
+        }
+        
+        function openEditModal(link) {
+            const id = link.getAttribute('data-id');
+            const nombre = link.getAttribute('data-nombre');
+            const telefono = link.getAttribute('data-telefono');
+            const correo = link.getAttribute('data-correo');
+
+            document.getElementById('editId').value = id;
+            document.getElementById('editNombre').value = nombre;
+            document.getElementById('editTelefono').value = telefono;
+            document.getElementById('editCorreo').value = correo;
+
+            document.getElementById('editForm').action = '/proveedores/editar/' + id;
+
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+    </script>
+    <script src="/scriptReutilisable.js"></script>
 </body>
 
 </html>
