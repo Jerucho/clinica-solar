@@ -26,7 +26,7 @@ public class JefeCompraController {
 	@GetMapping()
 	public String home(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
+		if (usuario == null || usuario.getRol().getIdRol() != 1) {
 			return "redirect:/login";
 		}
 		model.addAttribute("usuario", usuario);
@@ -36,7 +36,7 @@ public class JefeCompraController {
 	@GetMapping("/inventario")
 	public String inventario(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
+		if (usuario == null || usuario.getRol().getIdRol() != 1) {
 			return "redirect:/login";
 		}
 
@@ -53,7 +53,7 @@ public class JefeCompraController {
 	public String pedidos(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-		if (usuario == null || usuario.getIdRol() != 1) {
+		if (usuario == null || usuario.getRol().getIdRol() != 1) {
 			return "redirect:/login";
 		}
 		model.addAttribute("usuario", usuario);
@@ -64,7 +64,7 @@ public class JefeCompraController {
 	@GetMapping("/compra")
 	public String compra(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
+		if (usuario == null || usuario.getRol().getIdRol() != 1) {
 			return "redirect:/login";
 		}
 		model.addAttribute("usuario", usuario);
@@ -75,7 +75,7 @@ public class JefeCompraController {
 	@GetMapping("/proveedores")
 	public String proveedores(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if (usuario == null || usuario.getIdRol() != 1) {
+		if (usuario == null || usuario.getRol().getIdRol() != 1) {
 			return "redirect:/login";
 		}
 		model.addAttribute("usuario", usuario);

@@ -5,17 +5,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.sharp.clinica_solar.models.Elemento;
 import com.sharp.clinica_solar.models.Producto;
 import com.sharp.clinica_solar.repositories.ProductoRepository;
+import com.sharp.clinica_solar.services.ElementoService;
 
+import java.util.List;
 import java.util.Optional;
 
-@Controller
-@RequestMapping("/productos")
+@RestController
+@RequestMapping("/elementos")
 public class ProductoController {
 
     @Autowired
     private ProductoRepository productoRepo;
+    
+    @Autowired
+    private ElementoService elementoService;
 
     @GetMapping
     public String listarProductos(Model model) {
@@ -44,6 +50,11 @@ public class ProductoController {
     public String eliminarProducto(@PathVariable int id) {
         productoRepo.deleteById(id);
         return "redirect:/productos";
+    }
+    
+    @GetMapping("/buscar")
+    public List<Elemento> buscar(@RequestParam String query) {
+        return elementoService.encontrarCoincidenciasPorNombre(query);
     }
 }
 

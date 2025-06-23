@@ -6,53 +6,90 @@
 	<title>Pedidos</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
-	<div class="flex">
+	<div class="flex min-h-screen">
 		<div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
-		<div>
-			<h1>Bienvenido</h1>
-			<p>Listas de Pedidos</p>
-		</div>
-		
-		
-		<div th:if="${#lists.isEmpty(pedidos)}" class="p-4">
-            <p class="text-gray-500">No hay pedidos disponibles.</p>
-			        </div>
-					
-			<div th:unless="${#lists.isEmpty(pedidos)}" class="p-4">
-		<table>
-			<thead>
-                <tr>
-                    <th>ID Pedido</th>
-                    <th>Fecha</th>
-                    <th>Proveedor</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="pedido : ${pedidos}">
-                    <td th:text="${pedido.id}"></td>
-                    <td th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy')}"></td>
-                    <td th:text="${pedido.proveedor.nombre}"></td>
-                    <td th:text="${pedido.total}"></td>
-                    <td th:text="${pedido.estado}"></td>
-                    <td>
-                        <a th:href="@{/compras/detalle/{id}(id=${pedido.id})}" class="text-blue-500 hover:underline">Ver Detalles</a>
-                    </td>
-                </tr>
-            </tbody>
-			
-			
+
+		<div class="flex-grow p-8 rounded-lg">
+			<h1 class="text-3xl font-bold mb-6 text-gray-800">Lista de Compras</h1>
+
+			<table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+				<thead>
+					<tr class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+						<th class="py-3 px-6 text-left">Producto</th>
+						<th class="py-3 px-6 text-left">Area</th>
+						<th class="py-3 px-6 text-left">Cantidad</th>
+						<th class="py-3 px-6 text-center">Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="border-b border-gray-200 hover:bg-gray-100">
+						<td class="py-4 px-6">Guante</td>
+						<td class="py-4 px-6">Dental</td>
+						<td class="py-4 px-6">5</td>
+						<td class="py-4 px-6 text-center">
+							<button
+								onclick="openModal('Guante', '5', 'Huawei', 'Talla M', 'Necesario para procedimientos')"
+								class="text-green-600 hover:text-blue-800">
+								Información
+							</button>
+							|
+							<button>
+								<a class="text-red-600 hover:text-red-800">Eliminar</a>
+							</button>
+
+						</td>
+					</tr>
+				</tbody>
 			</table>
+
+			<div id="infoModal"
+				class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+				<div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+					<h2 class="text-xl font-bold mb-4">Información del pedido</h2>
+					<p><strong>Producto:</strong> <span id="modalprod"></span></p>
+					<p><strong>Cantidad:</strong> <span id="modalcant"></span></p>
+					<p><strong>Marca:</strong> <span id="modalmarc"></span></p>
+					<p><strong>Medida:</strong> <span id="modalmedi"></span></p>
+					<p><strong>Justificacion:</strong> <span id="modaljusti"></span></p>
+
+
+					<div class="text-right mt-4">
+						<button onclick="" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+							Aceptar
+						</button>
+						<button onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+							Cerrar
+						</button>
+					</div>
+				</div>
 			</div>
-			</div>
-						
+			<script>
+				function openModal(producto, cantidad, marca, medida, justificacion) {
+					document.getElementById('modalprod').textContent = producto;
+					document.getElementById('modalcant').textContent = cantidad;
+					document.getElementById('modalmarc').textContent = marca;
+					document.getElementById('modalmedi').textContent = medida
+					document.getElementById('modaljusti').textContent = justificacion;
+
+
+					document.getElementById('infoModal').classList.remove('hidden');
+				}
+
+				function closeModal() {
+					document.getElementById('infoModal').classList.add('hidden');
+				}
+			</script>
+
 		</div>
+	</div>
+	<script src="/scriptReutilisable.js"></script>
+
 </body>
 
 </html>
