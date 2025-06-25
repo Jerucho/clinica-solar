@@ -1,6 +1,7 @@
 package com.sharp.clinica_solar.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,4 +33,14 @@ public class SoliCompraController {
         soliCompraService.eliminarSolicitudPorIdYUsuario(id, usuario);
         return "redirect:/medico/listaSolicitudes";
     }
+    @GetMapping("/solicitud/modal/{id}")
+    public String verDetalleModal(@PathVariable("id") Long id, Model model) {
+        Optional<SoliCompra> opt = soliCompraService.obtenerSolicitudPorId(id);
+        if (opt.isPresent()) {
+            model.addAttribute("solicitud", opt.get());
+            return "medico/detallesolicitud :: modalContent";
+        }
+        return "fragments/error :: mensaje";
+    }
+
 }

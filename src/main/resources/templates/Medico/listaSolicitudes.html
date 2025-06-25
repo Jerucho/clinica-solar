@@ -5,8 +5,10 @@
   <title>Mis Solicitudes de Insumos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
   function confirmarEliminar(link) {
     const id = link.getAttribute('data-id');
@@ -24,12 +26,16 @@
       }
     });
   }
+
+  function cerrarModal() {
+    document.getElementById("modal").classList.add("hidden");
+    document.getElementById("modal-content").innerHTML = "";
+  }
 </script>
 
 <body class="bg-gray-100 min-h-screen p-6">
 
   <div class="flex gap-4">
-
     <div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
 
     <div class="flex-grow bg-white p-6 rounded shadow-lg">
@@ -58,24 +64,31 @@
                   <span th:case="*">-</span>
                 </span>
               </td>
-			  <td class="px-6 py-4 text-sm text-gray-700" th:text="${solicitud.cantidadTotalInsumos} + ' insumos'"></td>
-			  <td class="px-6 py-4 text-sm">
-			    <div class="flex space-x-3">
-			      <a th:href="@{/medico/solicitud/{id}(id=${solicitud.idSolicitud})}" 
-			         class="text-blue-600 hover:underline font-medium">
-			         Ver Detalle
-			      </a>
-
-			      <span class="text-gray-300">|</span>
-
-			      <a href="#"
-			         th:attr="data-id=${solicitud.idSolicitud}"
-			         onclick="confirmarEliminar(this)"
-			         class="text-red-600 hover:underline font-medium">
-			         Eliminar
-			      </a>
-			    </div>
+			  <td class="px-6 py-4 text-sm text-gray-700"
+			      th:text="${solicitud.cantidadTotalInsumos} + ' insumos'">
 			  </td>
+              <td class="px-6 py-4 text-sm">
+                <div class="flex space-x-3">
+                  <a href="#"
+                     class="text-blue-600 hover:underline font-medium"
+                     hx-get="/medico/solicitud/modal/{{solicitud.idSolicitud}}"
+                     hx-target="#modal-content"
+                     hx-swap="innerHTML"
+                     onclick="document.getElementById('modal').classList.remove('hidden')"
+                     th:attr="hx-get=@{'/medico/solicitud/modal/' + ${solicitud.idSolicitud}}">
+                     Ver Detalle
+                  </a>
+
+                  <span class="text-gray-300">|</span>
+
+                  <a href="#"
+                     th:attr="data-id=${solicitud.idSolicitud}"
+                     onclick="confirmarEliminar(this)"
+                     class="text-red-600 hover:underline font-medium">
+                     Eliminar
+                  </a>
+                </div>
+              </td>
             </tr>
           </tbody>
           <tbody th:if="${solicitudes.size() == 0}">
@@ -89,6 +102,14 @@
       </div>
     </div>
   </div>
-
+ 
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white w-full max-w-2xl rounded shadow-lg p-6 relative">
+      <button class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+              onclick="cerrarModal()">&times;</button>
+      <div id="modal-content" class="space-y-4">
+      </div>
+    </div>
+  </div>
 </body>
 </html>

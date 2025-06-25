@@ -58,4 +58,8 @@ public class SoliCompraService {
 	        soliCompraRepository.delete(solicitud.get());
 	    }
 	}
+	public Optional<SoliCompra> obtenerSolicitudPorId(Long id) {
+	    return soliCompraRepository.findById(id);
+	}
+
 }

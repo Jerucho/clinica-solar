@@ -1,0 +1,45 @@
+<!-- medico/detallesolicitud.html -->
+<div th:fragment="modalContent">
+  <div id="modalDetalle" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+      
+      <button class="absolute top-2 right-3 text-2xl text-gray-400 hover:text-red-600" onclick="cerrarModal()">&times;</button>
+      
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Detalle de Solicitud</h2>
+      
+      <p><strong>ID:</strong> <span th:text="${solicitud.idSolicitud}"></span></p>
+      <p><strong>Fecha de creación:</strong>
+        <span th:text="${#temporals.format(solicitud.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+      </p>
+      <p><strong>Estado:</strong>
+        <span th:if="${solicitud.statusSolicitud == 'P'}" class="text-yellow-600 font-semibold">Pendiente</span>
+        <span th:if="${solicitud.statusSolicitud == 'A'}" class="text-green-600 font-semibold">Aprobada</span>
+        <span th:if="${solicitud.statusSolicitud == 'R'}" class="text-red-600 font-semibold">Rechazada</span>
+      </p>
+
+      <div class="mt-4">
+        <table class="min-w-full bg-white border rounded">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-bold">Insumo</th>
+              <th class="px-4 py-2 text-left text-sm font-bold">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="item : ${solicitud.elementos}">
+              <td class="px-4 py-2 text-sm" th:text="${item.elemento.nomElemento}">Nombre</td>
+              <td class="px-4 py-2 text-sm" th:text="${item.cantSolicitada}">0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 text-right">
+        <button onclick="cerrarModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
