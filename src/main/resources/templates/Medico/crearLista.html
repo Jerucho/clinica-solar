@@ -39,7 +39,6 @@
 	        </table>
 	      </div>
 	
-	      <!-- Botón -->
 	      <button id="btnCrearSolicitud"
 	        class="mt-6 self-end px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">
 	        Crear Solicitud
@@ -47,7 +46,6 @@
 	    </div>
 	  </div>
 	
-	  <!-- Script funcional -->
 	  <script>
 	    const input = document.getElementById("buscador");
 	    const datalist = document.getElementById("listaInsumos");
@@ -56,7 +54,6 @@
 	
 	    let insumosCargados = [];
 	
-	    // Buscar insumos al escribir
 	    input.addEventListener("input", () => {
 	      const seleccion = insumosCargados.find(item => item.nomElemento === input.value);
 	      if (seleccion) {
@@ -65,7 +62,6 @@
 	      }
 	    });
 	
-	    // Cargar insumos desde el backend
 	    async function cargarSugerencias() {
 	      try {
 	        const response = await fetch('/elementos/buscar?query=');
@@ -83,7 +79,6 @@
 	      }
 	    }
 	
-	    // Agrega fila a tabla
 	    function agregarElemento(item) {
 	      const yaExiste = document.querySelector(`tr[data-id="${item.idElemento}"]`);
 	      if (yaExiste) return;
@@ -103,62 +98,77 @@
 	        </tr>`;
 	    }
 	
-	    // Eliminar fila
 	    function eliminarElemento(idElemento) {
 	      const fila = document.querySelector(`tr[data-id="${idElemento}"]`);
 	      if (fila) fila.remove();
 	    }
 	
-	    // Crear solicitud
-	    btnCrearSolicitud.addEventListener("click", async () => {
-	      const filas = Array.from(tablaElementos.querySelectorAll("tr"));
-	      const elementos = filas.map(fila => {
-	        const idElemento = fila.getAttribute("data-id");
-	        const nombre = fila.querySelector("td:nth-child(1)").textContent;
-	        const cantidad = fila.querySelector("input[type='number']").value;
-	        return {
-	          nombre: nombre,
-	          cantidad: parseInt(cantidad),
-	          idElemento: parseInt(idElemento)
-	        };
-	      });
-	
-	      if (elementos.length === 0) {
-	        Swal.fire({
-	          icon: 'warning',
-	          title: 'No hay elementos para enviar',
-	          text: 'Por favor, agrega al menos un elemento antes de crear la solicitud.'
-	        });
-	        return;
-	      }
-	
-	      try {
-	        const response = await fetch('/medico/solicitarCompra', {
-	          method: 'POST',
-	          headers: { 'Content-Type': 'application/json' },
-	          body: JSON.stringify(elementos)
-	        });
-	
-	        if (response.ok) {
-	          Swal.fire({
-	            icon: 'success',
-	            title: 'Solicitud creada',
-	            text: 'La solicitud se ha creado exitosamente.'
-	          });
-	          tablaElementos.innerHTML = "";
-	        } else {
-	          throw new Error('Error al crear la solicitud');
-	        }
-	      } catch (error) {
-	        Swal.fire({
-	          icon: 'error',
-	          title: 'Error',
-	          text: error.message
-	        });
-	      }
-	    });
-	
-	    // Ejecutar al cargar la página
+		btnCrearSolicitud.addEventListener("click", async () => {
+		  const filas = Array.from(tablaElementos.querySelectorAll("tr"));
+
+		  if (filas.length === 0) {
+		    Swal.fire({
+		      icon: 'warning',
+		      title: 'No hay elementos para enviar',
+		      text: 'Por favor, agrega al menos un elemento antes de crear la solicitud.'
+		    });
+		    return;
+		  }
+
+		  const elementos = [];
+		  let tieneCantidadValida = false;
+
+		  for (const fila of filas) {
+		    const idElemento = fila.getAttribute("data-id");
+		    const nombre = fila.querySelector("td:nth-child(1)").textContent;
+		    const cantidad = parseInt(fila.querySelector("input[type='number']").value);
+
+		    if (!isNaN(cantidad) && cantidad > 0) {
+		      tieneCantidadValida = true;
+		    }
+
+		    elementos.push({
+		      nombre: nombre,
+		      cantidad: cantidad,
+		      idElemento: parseInt(idElemento)
+		    });
+		  }
+
+		  if (!tieneCantidadValida) {
+		    Swal.fire({
+		      icon: 'warning',
+		      title: 'Cantidad requerida',
+		      text: 'Debes ingresar al menos una cantidad válida para solicitar.'
+		    });
+		    return;
+		  }
+
+		  try {
+		    const response = await fetch('/medico/solicitarCompra', {
+		      method: 'POST',
+		      headers: { 'Content-Type': 'application/json' },
+		      body: JSON.stringify(elementos)
+		    });
+
+		    if (response.ok) {
+		      Swal.fire({
+		        icon: 'success',
+		        title: 'Solicitud creada',
+		        text: 'La solicitud se ha creado exitosamente.'
+		      });
+		      tablaElementos.innerHTML = "";
+		    } else {
+		      throw new Error('Error al crear la solicitud');
+		    }
+		  } catch (error) {
+		    Swal.fire({
+		      icon: 'error',
+		      title: 'Error',
+		      text: error.message
+		    });
+		  }
+		});
+
 	    cargarSugerencias();
 	  </script>
 	</body>
