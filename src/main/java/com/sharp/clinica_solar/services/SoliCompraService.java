@@ -14,16 +14,19 @@ import com.sharp.clinica_solar.models.SoliElemento;
 import com.sharp.clinica_solar.models.Usuario;
 import com.sharp.clinica_solar.repositories.ElementoRepository;
 import com.sharp.clinica_solar.repositories.SoliCompraRepository;
+import com.sharp.clinica_solar.repositories.SoliElementoRepository;
 
 @Service
 public class SoliCompraService {
 
 	private final SoliCompraRepository soliCompraRepository;
 	private final ElementoRepository elementoRepository;
-
-	public SoliCompraService(SoliCompraRepository soliCompraRepository, ElementoRepository elementoRepository) {
+	private final SoliElementoRepository soliElementoRepository;
+	
+	public SoliCompraService(SoliCompraRepository soliCompraRepository, ElementoRepository elementoRepository, SoliElementoRepository soliElementoRepository) {
 		this.soliCompraRepository = soliCompraRepository;
 		this.elementoRepository = elementoRepository;
+		this.soliElementoRepository = soliElementoRepository;
 	}
 
 	public void guardarSolicitudDesdeDTO(List<SolicitudInsumoDTO> insumos, Usuario usuario) {
@@ -65,6 +68,13 @@ public class SoliCompraService {
 	}
 	public Optional<SoliCompra> obtenerSolicitudPorId(Long id) {
 	    return soliCompraRepository.findById(id);
+	}
+	public void guardarSoliElemento(SoliElemento soliElemento) {
+	    soliElementoRepository.save(soliElemento);
+	}
+	
+	public void guardarSoliCompra(SoliCompra soliCompra) {
+	    soliCompraRepository.save(soliCompra);
 	}
 
 }

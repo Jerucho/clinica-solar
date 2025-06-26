@@ -2,32 +2,45 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Lista de Pedidos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title>Lista de Pedidos</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100">
+	<div class="flex">
+		<div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
 
-    <h1 class="text-3xl font-bold mb-4">Lista de Pedidos</h1>
 
-    <table class="min-w-full bg-white shadow-md rounded ">
-        <thead class="bg-gray-200">
-            <tr>
-                <th class="px-4 py-2">ID</th>
-                <th class="px-4 py-2">Usuario</th>
-                <th class="px-4 py-2">Fecha</th>
-                <th class="px-4 py-2">Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="soli : ${solicitudes}" class="border-b">
-                <td class="px-4 py-2" th:text="${soli.idSolicitud}">1</td>
-                <td class="px-4 py-2" th:text="${soli.usuario.nomUsuario}">Usuario</td>
-                <td class="px-4 py-2" th:text="${#temporals.format(soli.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</td>
-                <td class="px-4 py-2" th:text="${soli.statusSolicitud}">P</td>
-            </tr>
-        </tbody>
-    </table>
+		<div class="p-6 flex-grow">
+			<h1 class="text-3xl font-bold mb-4">Lista de Pedidos</h1>
 
+			<table class="min-w-full bg-white shadow-md rounded ">
+				<thead class="bg-gray-200">
+					<tr>
+						<th class="px-4 py-2 text-left">ID</th>
+						<th class="px-4 py-2 text-left">Usuario</th>
+						<th class="px-4 py-2 text-left">Fecha</th>
+						<th class="px-4 py-2 text-left">Estado</th>
+						<th class="px-4 py-2 text-right">Accion</th>
+						
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="soli : ${solicitudes}" class="border-b">
+						<td class="px-4 py-2" th:text="${soli.idSolicitud}">1</td>
+						<td class="px-4 py-2" th:text="${soli.usuario.nomUsuario}"></td>
+						<td class="px-4 py-2"
+							th:text="${#temporals.format(soli.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+						<td class="px-4 py-2" th:text="${soli.statusSolicitud}"></td>
+						<td class="px-4 py-2 text-right">
+                            <a th:href="@{/jefecompras/pedidos/{id}(id=${soli.idSolicitud})}"
+                                class="text-blue-500 hover:text-blue-700">Completar</a>
+						</td>
+						
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </body>
 </html>

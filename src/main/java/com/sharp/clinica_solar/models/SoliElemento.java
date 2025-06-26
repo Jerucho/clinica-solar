@@ -23,6 +23,9 @@ public class SoliElemento {
 	@Column(nullable = false)
 	private int cantSolicitada;
 
+	@ManyToOne
+	private PrecioProveedor precioSeleccionado;
+	
 	public SoliElemento() {
 		super();
 	}
@@ -35,6 +38,14 @@ public class SoliElemento {
 		this.cantSolicitada = cantSolicitada;
 	}
 
+	public PrecioProveedor getPrecioSeleccionado() {
+	    return precioSeleccionado;
+	}
+
+	public void setPrecioSeleccionado(PrecioProveedor precioSeleccionado) {
+	    this.precioSeleccionado = precioSeleccionado;
+	}
+	
 	public Integer getIdSoliElemento() {
 		return idSoliElemento;
 	}

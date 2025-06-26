@@ -1,48 +1,99 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Compras</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<meta charset="UTF-8">
+<title>Compras</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <div class="flex">
-        <div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
+	<div class="flex">
+		<div th:replace="fragments/BarraLateral :: barraLateral(${usuario})"></div>
 
-        <div class="p-6 flex-grow">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Compras de Áreas</h1>
+		<div class="p-6 flex-grow">
 
-            <!-- Dropdown -->
-            <div class="mb-6 w-80">
-                <label for="proveedores-select" class="block mb-2 text-gray-700 font-medium">Proveedores</label>
-                <select id="proveedores-select"
-                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="" disabled selected>Seleccione un proveedor</option>
-                    <option th:each="prov : ${listaProveedores}"
-                        th:value="${prov.idProveedor}"
-                        th:text="${prov.nomProveedor}">
-                    </option>
-                </select>
-            </div>
+			<p>
+				<strong>ID:</strong> <span th:text="${solicitud.idSolicitud}"></span>
+			</p>
+			<p>
+				<strong>Fecha de creación:</strong> <span
+					th:text="${#temporals.format(solicitud.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+			</p>
+			<p>
+				<strong>Estado:</strong> <span
+					th:if="${solicitud.statusSolicitud == 'P'}"
+					class="text-yellow-600 font-semibold">Pendiente</span> <span
+					th:if="${solicitud.statusSolicitud == 'A'}"
+					class="text-green-600 font-semibold">Aprobada</span> <span
+					th:if="${solicitud.statusSolicitud == 'R'}"
+					class="text-red-600 font-semibold">Rechazada</span>
+			</p>
 
-            <!-- Card proveedor con ancho reducido -->
-            <div class="bg-white shadow-md p-4 rounded-lg w-[30em]">
-                <div class="flex items-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-bold mr-4">
-                        <span>SE</span>
-                    </div>
-                    <div class="text-sm">
-                        <h3 class="text-base font-semibold text-gray-800">Sac. Envios</h3>
-                        <p class="text-gray-600"><strong>Ubicación:</strong> Pueblo joven, los olvidados de Dios SJL</p>
-                        <p class="text-gray-600"><strong>Teléfono:</strong> +51 947 312 390</p>
-                        <p class="text-gray-600"><strong>Correo:</strong> faviormosd@gmail.com</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="/scriptReutilisable.js"></script>
+			<div class="mt-4">
+				<form th:action="@{/jefecompras/compras/finalizar}" method="post">
+					<input type="hidden" name="solicitudId"
+						th:value="${solicitud.idSolicitud}" />
+
+					<table class="min-w-full bg-white border rounded">
+						<thead>
+							<tr>
+								<th>Insumo</th>
+								<th>Cantidad</th>
+								<th>Precio Unitario</th>
+								<th>Total</th>
+								<th>Proveedor</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item : ${solicitud.elementos}">
+								<td class="px-4 py-2 text-sm"
+									th:text="${item.elemento.nomElemento}">Nombre</td>
+								<td class="px-4 py-2 text-sm" th:text="${item.cantSolicitada}">0</td>
+
+								<td class="px-4 py-2 text-sm"
+									th:text="${precioMap[item.elemento.idElemento] != null ? precioMap[item.elemento.idElemento].precioElemento : 'N/A'}">
+									0.00</td>
+
+								<td class="px-4 py-2 text-sm"
+									th:text="${precioMap[item.elemento.idElemento] != null ? #numbers.formatDecimal(precioMap[item.elemento.idElemento].precioElemento * item.cantSolicitada, 1, 'POINT', 2, 'NONE') : 'N/A'}">
+									0.00</td>
+
+								<td class="px-4 py-2 text-sm"><select
+									name="proveedor_${item.elemento.idElemento}"
+									class="form-select">
+										<option
+											th:each="p : ${precioMap[item.elemento.idElemento].proveedores}"
+											th:value="${p.idProveedor}" th:text="${p.nomProveedor}">
+											Proveedor</option>
+								</select></td>
+							</tr>
+						</tbody>
+
+						<!-- TOTAL GENERAL -->
+						<tfoot>
+							<tr>
+								<td colspan="3" class="text-right font-bold px-4 py-2">Total:</td>
+								<td colspan="2" class="font-bold px-4 py-2"
+									th:text="${totalCompra != null ? #numbers.formatDecimal(totalCompra, 1, 'POINT', 2, 'NONE') : '0.00'}">
+									0.00</td>
+							</tr>
+						</tfoot>
+					</table>
+
+
+					<div class="mt-4">
+						<button type="submit"
+							class="bg-green-600 text-white px-4 py-2 rounded">
+							Finalizar Compra</button>
+					</div>
+				</form>
+
+			</div>
+
+
+		</div>
+	</div>
+	<script src="/scriptReutilisable.js"></script>
 </body>
 </html>

@@ -11,8 +11,6 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class PrecioProveedor {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPrecioProveedor;
