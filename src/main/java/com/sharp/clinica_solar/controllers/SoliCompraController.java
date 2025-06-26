@@ -23,7 +23,7 @@ public class SoliCompraController {
 
     @GetMapping("/listaSolicitudes")
     public String mostrarSolicitudes(Model model, @SessionAttribute("usuario") Usuario usuario) {
-        List<SoliCompra> solicitudes = soliCompraService.obtenerSolicitudesPorUsuario(usuario);
+        List<SoliCompra> solicitudes = soliCompraService.obtenerSolicitudes();
         model.addAttribute("solicitudes", solicitudes);
         model.addAttribute("usuario", usuario);	
         return "medico/listasolicitudes";

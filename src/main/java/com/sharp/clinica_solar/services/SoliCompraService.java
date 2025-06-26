@@ -52,6 +52,11 @@ public class SoliCompraService {
 	public List<SoliCompra> obtenerSolicitudesPorUsuario(Usuario usuario) {
 	    return soliCompraRepository.findByUsuarioOrderByFechaCreacionDesc(usuario);
 	}
+	
+	public List<SoliCompra> obtenerSolicitudes() {
+	    return soliCompraRepository.findByStatusSolicitud("P");
+	}
+	
 	public void eliminarSolicitudPorIdYUsuario(Long id, Usuario usuario) {
 	    Optional<SoliCompra> solicitud = soliCompraRepository.findById(id);
 	    if (solicitud.isPresent() && solicitud.get().getUsuario().getIdUsuario() == usuario.getIdUsuario()) {
