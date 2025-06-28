@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/elementos")
 public class ProductoController {
 
@@ -46,10 +46,11 @@ public class ProductoController {
     }
     
     @PostMapping("/guardar")
-	public void guardarProducto(@ModelAttribute Elemento elemento, HttpServletResponse response) throws IOException {
+  public void guardarProducto(@ModelAttribute Elemento elemento, HttpServletResponse response) throws IOException {
 		elementoService.guardarElemento(elemento);
 		response.sendRedirect("/jefeareas/productos");
 	}
+
 
     @GetMapping("/eliminar/{id}")
     public String eliminarProducto(@PathVariable Long id ) {
