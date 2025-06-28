@@ -13,12 +13,14 @@ import com.sharp.clinica_solar.services.ElementoService;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/elementos")
 public class ProductoController {
 
     @Autowired
     private ProductoRepository productoRepo;
+    
+    
     
     @Autowired
     private ElementoService elementoService;
@@ -28,28 +30,28 @@ public class ProductoController {
         model.addAttribute("productos", productoRepo.findAll());
         return "Medico/crearLista";
     }
-
+    
     @GetMapping("/editar/{id}")
     public String editarProducto(@PathVariable int id, Model model) {
         Optional<Producto> producto = productoRepo.findById(id);
         if (producto.isPresent()) {
             model.addAttribute("producto", producto.get());
-            return "productos/formulario";
+            return "jefeareas/productos";
         } else {
-            return "redirect:/productos";
+            return "redirect:/jefeareas/productos";
         }
     }
 
     @PostMapping("/guardar")
-    public String guardarProducto(@ModelAttribute Producto producto) {
-        productoRepo.save(producto);
-        return "redirect:/productos";
+    public String guardarProducto(@ModelAttribute Elemento elemento) {
+        elementoService.guardarElemento(elemento);
+        return "redirect:/jefeareas/productos";
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminarProducto(@PathVariable int id) {
-        productoRepo.deleteById(id);
-        return "redirect:/productos";
+    public String eliminarProducto(@PathVariable Long id ) {
+        elementoService.eliminarElemento(id);
+        return "redirect:/jefeareas/productos";
     }
     
     @GetMapping("/buscar")

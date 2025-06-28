@@ -22,6 +22,14 @@ public class ElementoService {
 	public List<Elemento> encontrarCoincidenciasPorNombre(String query) {
 		return _elementoRepository.findByNomElementoContainingIgnoreCase(query);
 	}
-	
+
+	public void guardarElemento(Elemento elemento) {
+	    _elementoRepository.save(elemento);
+		
+	}
+
+	public void eliminarElemento(Long idElemento) {
+		_elementoRepository.deleteById(idElemento);
+	}
 	
 }

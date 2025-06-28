@@ -9,5 +9,6 @@ import com.sharp.clinica_solar.models.Elemento;
 
 @Repository
 public interface ElementoRepository extends JpaRepository<Elemento, Long> {
+		
 	List<Elemento> findByNomElementoContainingIgnoreCase(String query);
 }
