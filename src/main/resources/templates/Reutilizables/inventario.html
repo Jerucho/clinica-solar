@@ -43,10 +43,6 @@
 									class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky top-0 z-10 bg-gray-100">
 									Cantidad Disponible
 								</th>
-								<th th:if="${usuario.rol.idRol == 2}"
-									class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky top-0 z-10 bg-gray-100">
-									Acciones
-								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -60,15 +56,6 @@
 								<td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
 									<p class="text-gray-900 whitespace-no-wrap" th:text="${producto.cantActual}"></p>
 								</td>
-								<td th:if="${usuario.rol.idRol == 2}"
-									class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
-									<div class="flex gap-2">
-										<a th:href="@{/jefeareas/productos/editar/{id}(id=${producto.idElemento})}"
-											class="">Editar</a>
-										<a th:href="@{/jefeareas/productos/eliminar/{id}(id=${producto.idElemento})}"
-											class="">Eliminar</a>
-									</div>
-
 							</tr>
 						</tbody>
 					</table>
