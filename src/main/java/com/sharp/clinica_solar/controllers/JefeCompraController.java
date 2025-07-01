@@ -95,51 +95,48 @@ public class JefeCompraController {
 
 	@GetMapping("/pedidos/{id}")
 	public String completarPedido(Model model, @PathVariable("id") Long id, HttpSession session) {
-	    Usuario usuario = (Usuario) session.getAttribute("usuario");
-	    Optional<SoliCompra> solicitudOpt = soliCompraService.obtenerSolicitudPorId(id);
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		Optional<SoliCompra> solicitudOpt = soliCompraService.obtenerSolicitudPorId(id);
 
-	    if (usuario == null || usuario.getRol().getIdRol() != 1)
-	        return "redirect:/login";
-	    if (solicitudOpt.isEmpty())
-	        return "redirect:/pedidos";
+		if (usuario == null || usuario.getRol().getIdRol() != 1)
+			return "redirect:/login";
+		if (solicitudOpt.isEmpty())
+			return "redirect:/pedidos";
 
-	    SoliCompra solicitud = solicitudOpt.get();
-	    List<SoliElemento> items = solicitud.getElementos();
+		SoliCompra solicitud = solicitudOpt.get();
+		List<SoliElemento> items = solicitud.getElementos();
 
-	    Map<Integer, Map<String, Object>> precioMap = new HashMap<>();
-	    BigDecimal totalCompra = BigDecimal.ZERO;
+		Map<Integer, Map<String, Object>> precioMap = new HashMap<>();
+		BigDecimal totalCompra = BigDecimal.ZERO;
 
-	    for (SoliElemento item : items) {
-	        List<PrecioProveedor> precios = precioProveedorRepo
-	                .findByElemento_IdElemento(item.getElemento().getIdElemento());
+		for (SoliElemento item : items) {
+			List<PrecioProveedor> precios = precioProveedorRepo
+					.findByElemento_IdElemento(item.getElemento().getIdElemento());
 
-	        PrecioProveedor mejor = precios.stream().min(Comparator.comparing(PrecioProveedor::getPrecioElemento))
-	                .orElse(null);
+			PrecioProveedor mejor = precios.stream().min(Comparator.comparing(PrecioProveedor::getPrecioElemento))
+					.orElse(null);
 
-	        if (mejor != null) {
-	            Map<String, Object> data = new HashMap<>();
-	            data.put("precioElemento", mejor.getPrecioElemento());
-	            data.put("proveedores",
-	                    precios.stream()
-	                            .filter(p -> p.getPrecioElemento().compareTo(mejor.getPrecioElemento()) == 0)
-	                            .map(PrecioProveedor::getProveedor)
-	                            .collect(Collectors.toList()));
+			if (mejor != null) {
+				Map<String, Object> data = new HashMap<>();
+				data.put("precioElemento", mejor.getPrecioElemento());
+				data.put("proveedores",
+						precios.stream().filter(p -> p.getPrecioElemento().compareTo(mejor.getPrecioElemento()) == 0)
+								.map(PrecioProveedor::getProveedor).collect(Collectors.toList()));
 
-	            precioMap.put(item.getElemento().getIdElemento(), data);
+				precioMap.put(item.getElemento().getIdElemento(), data);
 
-	            // Acumular total
-	            BigDecimal subtotal = mejor.getPrecioElemento().multiply(BigDecimal.valueOf(item.getCantSolicitada()));
-	            totalCompra = totalCompra.add(subtotal);
-	        }
-	    }
+				// Acumular total
+				BigDecimal subtotal = mejor.getPrecioElemento().multiply(BigDecimal.valueOf(item.getCantSolicitada()));
+				totalCompra = totalCompra.add(subtotal);
+			}
+		}
 
-	    model.addAttribute("usuario", usuario);
-	    model.addAttribute("solicitud", solicitud);
-	    model.addAttribute("precioMap", precioMap);
-	    model.addAttribute("totalCompra", totalCompra);
-	    return "JefeCompras/comprarProductos";
+		model.addAttribute("usuario", usuario);
+		model.addAttribute("solicitud", solicitud);
+		model.addAttribute("precioMap", precioMap);
+		model.addAttribute("totalCompra", totalCompra);
+		return "JefeCompras/comprarProductos";
 	}
-
 
 	@GetMapping("/proveedores")
 	public String proveedores(Model model, HttpSession session) {
@@ -175,9 +172,17 @@ public class JefeCompraController {
 								proveedorId)
 						.orElseThrow(() -> new RuntimeException("PrecioProveedor no encontrado"));
 
+				System.out.println("Pedido #: " + item.getCantSolicitada());
+				System.out.println("Pedido #: " + item.getCantSolicitada());
+				
 				item.setPrecioSeleccionado(precioProveedor);
 				soliCompraService.guardarSoliElemento(item);
+
+				
 			}
+			int cantidadSolicitada = item.getCantSolicitada();
+			
+			_elementoService.actualizarStock(cantidadSolicitada, item.getElemento().getIdElemento());
 		}
 
 		solicitud.setStatusSolicitud("C"); // C = Comprado
